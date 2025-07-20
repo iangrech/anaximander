@@ -9,7 +9,16 @@ from datetime import datetime
 
 
 '''
-Builds a json structure of the target database defined in the config file 
+ - Builds a structure as a dataframe and dictionary. 
+ - Writes result to CSV and json files.
+ - Method get_database_definition(force_regen:bool=False) will return a tuple as
+
+   (dataframe, dictionary)
+
+   The method will either read the structure from the stored file or regenerate the files if force_regen=True.
+   Regardless of force_regen, if the files are more than definition_keep_alive_days (set in the configuration file)
+   the method will regenerate the files.
+
 '''
 
 class postgres_generator:
