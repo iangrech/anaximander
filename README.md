@@ -2,7 +2,7 @@
 
 ## The Application
 
-This application builds a basic database dictionary template as an HTML document by parsing an existing database. There are other, more mature tools ([SchemaSpy](https://schemaspy.org/), (tbls)[https://github.com/k1LoW/tbls/tree/main])
+This application builds a basic database dictionary template as an HTML document by parsing an existing database. There are other, more mature tools ([SchemaSpy](https://schemaspy.org/), [tbls](https://github.com/k1LoW/tbls/tree/main))
 
 The application is written in Python and uses Flask to display the document. Project is a **Work In Progress**.
 
