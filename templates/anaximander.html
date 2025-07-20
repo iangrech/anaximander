@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page_title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='anaximander.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1 id="top">{{ document_title }}</h1>
+        
+        <!-- Schema Navigation -->
+        <div class="schema-nav">
+            <h2 class="schema-section-heading">Schemas</h2>
+            <ul>
+                {% for schema_name, schema in schemas.items() %}
+                <li><a href="#schema-{{ schema_name }}">{{ schema_name }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Schema Details -->
+        {% for schema_name, schema in schemas.items() %}
+        <div class="schema-section" id="schema-{{ schema_name }}">
+            <h2>Schema: {{ schema_name }}</h2>
+            
+            <!-- Table Navigation -->
+            <div class="table-nav">
+                <h3 class="table-section-heading">Tables</h3>
+                <ul>
+                    {% for table_name, table in schema['tables'].items() %}
+                    <li><a href="#table-{{ schema_name }}-{{ table_name }}">{{ table_name }}</a></li>
+                    {% endfor %}
+                </ul>
+                <div class="nav-buttons">
+                    <a href="#top" style="color: #c7d7e8; background: #3498db;" class="nav-button">Return to Top</a>
+                </div>
+            </div>
+
+
+            <!-- Table Details -->
+            {% for table_name, table in schema['tables'].items() %}
+            <div class="table-section">
+                <!-- Hidden anchor for precise foreign key linking -->
+                <a id="table-{{ schema_name }}-{{ table_name }}" class="hidden-anchor"></a>
+                <a id="table-{{ table_name }}-header" class="hidden-anchor"></a>
+                <h3>Table: {{ table_name }}</h3>
+                
+                <!-- Columns Section -->
+                <div class="columns-section">
+                    <h4 class="section-heading">Columns</h4>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <!--<th>Position</th>-->
+                                <th>Data Type</th>
+                                <th style="text-align: center">Nullable</th>
+                                <th>Identity</th>
+                                <th>PK</th>
+                                <th>FK</th>
+                                <th>UQ</th>
+                                <!--<th>Default</th>-->
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for column in table['columns'] %}
+                            <tr>
+                                <td>{{ column['column_name'] }}</td>
+                                <!--<td>{{ column['column_position'] }}</td>-->
+                                <td>{{ column['data_type'] }}</td>
+                                <td>{{ 'Y' if column['is_nullable'] else 'N' }}</td>
+                                <td>{{ column['is_identity'] }}</td>
+                                <td>{{ column['pk'] }}</td>
+                                <td>{{ column['fk'] }}</td>
+                                <td>{{ column['uq'] }}</td>
+                                <!--<td>{{ column['default_value'] }}</td>-->
+                                <td>{{ column['description'] }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Constraints Section -->
+                <div class="constraints-section">
+                    <h4 class="section-heading">Constraints</h4>
+                    {% if table['constraints'] %}
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Column</th>
+                                <th>References</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for constraint in table['constraints'] %}
+                            <tr>
+                                <td>{{ constraint['constraint_name'] }}</td>
+                                <td>{{ constraint['constraint_type'] }}</td>
+                                <td>{{ constraint['column_name'] }}</td>
+                                <td>
+                                    {# {% if constraint['constraint_type'] == 'FOREIGN KEY' and constraint['fk_references'] %} #}
+                                    {% if constraint['constraint_type'] == 'FOREIGN KEY' %}
+                                        {% set ref_parts = constraint['fk_references'].split('.') %}
+                                        {% if ref_parts|length >= 2 %}
+                                            <a href="#table-{{ ref_parts[0] }}-header" class="fk-link">
+                                                {{ constraint['fk_references'] }}
+                                            </a>
+                                        {% else %}
+                                            {{ constraint['fk_references'] }}
+                                        {% endif %}
+                                    {% else %}
+                                        {{ constraint['fk_references'] }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <p style="font-size: 75%">No constraints defined for this table.</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Indexes Section -->
+                <div class="indexes-section">
+                    <h4 class="section-heading">Indexes</h4>
+                    {% if table['index'] %}
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Columns</th>
+                                <th>Type</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for index in table['index'] %}
+                            <tr>
+                                <td>{{ index.get('index_name', '') }}</td>
+                                <td>{{ index.get('column_name', '') }}</td>
+                                <td>{{ index.get('index_type', '') }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <p style="font-size: 75%">No indexes defined for this table.</p>
+                    {% endif %}
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div class="nav-buttons">
+                    <a href="#schema-{{ schema_name }}" class="nav-button">Return to Schema</a>
+                    <a href="#top" class="nav-button">Return to Top</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Footer -->
+    <footer class="page-footer">
+        <div class="footer-left">
+            Brought to you by <a href="https://github.com/iangrech/Anaximander" target="_blank">Project Anaximander</a>
+        </div>
+        <div class="footer-right">
+            Licence: <a href="https://github.com/iangrech/Anaximander?tab=GPL-3.0-1-ov-file#readme" target="_blank">GPL3.0</a>
+        </div>
+    </footer>
+
+</body>
+</html>

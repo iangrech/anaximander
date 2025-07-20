@@ -1,0 +1,8 @@
+[postgresql]
+host = 255.254.255.254
+database = Adventureworks
+user = postgres
+password = it_is_a_secret
+port = 5432
+definition_keep_alive_days = 7
+db_definition_file = adventureworks
